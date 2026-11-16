@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Fitness Gym - Javed Bahria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <link href="https://cdn.jsdelivr.net/fontsource/css/poppins@latest/index.css" rel="stylesheet">
+    <style>
+        * { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
+        
+        :root {
+            --dark: #0f0f23;
+            --primary: #ff6b35;
+            --accent: #ffb347;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+
+        /* Loader */
+        .loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark); display: flex; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.5s, visibility 0.5s;
+        }
+        .loader.hidden { opacity: 0; visibility: hidden; }
+        .loader-dumbbell {
+            width: 120px; height: 40px; position: relative;
+            animation: liftWeight 1s ease-in-out infinite;
+        }
+        .loader-dumbbell::before, .loader-dumbbell::after {
+            content: ''; position: absolute; width: 20px; height: 40px;
+            background: var(--primary); border-radius: 4px; top: 0;
+        }
+        .loader-dumbbell::before { left: 0; }
+        .loader-dumbbell::after { right: 0; }
+        .loader-bar {
+            position: absolute; width: 80px; height: 8px; background: #ccc;
+            top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 4px;
+        }
+        @keyframes liftWeight {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Hero Section - FIXED FOR MOBILE */
+        .hero {
+            background: linear-gradient(135deg, rgba(15,15,35,0.95), rgba(26,26,46,0.9)),
+                        repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,107,53,0.03) 35px, rgba(255,107,53,0.03) 70px);
+            /* Use dvh for mobile browser compatibility to prevent cutting off */
+            min-height: 100vh; 
+            min-height: 100dvh; 
+            position: relative; overflow: hidden;
+            padding-top: 80px; /* Added padding to prevent navbar overlap on small screens */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,107,53,0.1) 0%, transparent 50%);
+            animation: heroGlow 8s ease-in-out infinite;
+        }
+        @keyframes heroGlow {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(5%, 5%); }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute; border-radius: 50%;
+            background: rgba(255,107,53,0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+        }
+
+        /* Navbar */
+        .navbar {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .navbar.scrolled {
+            background: rgba(15,15,35,0.98) !important;
+            box-shadow: 0 4px 30px rgba(255,107,53,0.2);
+        }
+
+        /* Glowing text */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(255,107,53,0.5), 0 0 20px rgba(255,107,53,0.3);
+        }
+
+        /* Service Cards */
+        .service-card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(255,107,53,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+        }
+        .service-card::before {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,107,53,0.1), transparent);
+            transition: left 0.5s;
+        }
+        .service-card:hover::before { left: 100%; }
+        .service-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(255,107,53,0.2);
+        }
+
+        /* Pricing Cards */
+        .pricing-card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(255,107,53,0.1);
+            transition: all 0.4s ease;
+            position: relative; overflow: hidden;
+        }
+        .pricing-card.featured {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+        .pricing-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(255,107,53,0.3);
+        }
+        .pricing-card.featured:hover {
+            transform: translateY(-5px) scale(1.07);
+        }
+
+        /* Stats Counter */
+        .stat-item {
+            position: relative;
+        }
+        .stat-item::after {
+            content: ''; position: absolute; bottom: -10px; left: 50%;
+            transform: translateX(-50%); width: 0; height: 3px;
+            background: var(--primary); transition: width 0.3s;
+        }
+        .stat-item:hover::after { width: 80%; }
+
+        /* Trainer Cards */
+        .trainer-card {
+            position: relative; overflow: hidden; border-radius: 16px;
+            transition: all 0.4s ease;
+        }
+        .trainer-card:hover { transform: scale(1.03); }
+        .trainer-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(transparent, rgba(15,15,35,0.95));
+            padding: 2rem; transform: translateY(50%);
+            transition: transform 0.4s ease;
+        }
+        .trainer-card:hover .trainer-overlay { transform: translateY(0); }
+
+        /* Schedule Table */
+        .schedule-table th, .schedule-table td {
+            padding: 12px 16px; text-align: center;
+        }
+        .schedule-table tr { transition: background 0.3s; }
+        .schedule-table tbody tr:hover { background: rgba(255,107,53,0.1); }
+
+        /* CTA Button */
+        .cta-btn {
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, var(--primary), #ff8c42);
+            transition: all 0.3s ease;
+        }
+        .cta-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .cta-btn:hover::before { left: 100%; }
+        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,107,53,0.4); }
+
+        /* Section Title */
+        .section-title {
+            position: relative; display: inline-block;
+        }
+        .section-title::after {
+            content: ''; position: absolute; bottom: -10px; left: 50%;
+            transform: translateX(-50%); width: 60px; height: 4px;
+            background: var(--primary); border-radius: 2px;
+        }
+
+        /* Testimonial Slider */
+        .testimonial-card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(255,107,53,0.1);
+            border-radius: 16px; padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        .testimonial-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(255,107,53,0.1);
+        }
+
+        /* BMI Calculator */
+        .bmi-result {
+            transition: all 0.5s ease;
+        }
+
+        /* Gallery */
+        .gallery-item {
+            overflow: hidden; border-radius: 12px;
+            transition: all 0.4s ease;
+        }
+        .gallery-item:hover { transform: scale(1.05); z-index: 10; }
+        .gallery-item img { transition: transform 0.4s ease; }
+        .gallery-item:hover img { transform: scale(1.1); }
+
+        /* Pulse animation for icons */
+        .pulse-icon {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Marquee */
+        .marquee {
+            overflow: hidden; white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        .mobile-menu.active { transform: translateX(0); }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; opacity: 0; visibility: hidden;
+            transition: all 0.3s ease; z-index: 1000;
+            box-shadow: 0 4px 15px rgba(255,107,53,0.4);
+        }
+        .back-to-top.visible { opacity: 1; visibility: visible; }
+        .back-to-top:hover { transform: translateY(-5px); }
+
+        /* Gradient borders */
+        .gradient-border {
+            position: relative;
+        }
+        .gradient-border::before {
+            content: ''; position: absolute; inset: -2px;
+            background: linear-gradient(135deg, var(--primary), var(--accent), var(--primary));
+            border-radius: inherit; z-index: -1;
+            animation: borderRotate 3s linear infinite;
+        }
+        @keyframes borderRotate {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* Typing animation */
+        .typing-text {
+            border-right: 3px solid var(--primary);
+            animation: blink 0.7s step-end infinite;
+        }
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        /* Ripple effect */
+        .ripple {
+            position: relative; overflow: hidden;
+        }
+        .ripple::after {
+            content: ''; position: absolute;
+            width: 100%; height: 100%;
+            top: 0; left: 0;
+            background: radial-gradient(circle, rgba(255,107,53,0.3) 0%, transparent 70%);
+            transform: scale(0); opacity: 0;
+            transition: all 0.6s ease;
+        }
+        .ripple:active::after {
+            transform: scale(2); opacity: 1;
+            transition: 0s;
+        }
+
+        /* Contact form */
+        .form-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,107,53,0.2);
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(255,107,53,0.2);
+            outline: none;
+        }
+
+        /* Progress bars */
+        .progress-bar {
+            height: 8px; border-radius: 4px;
+            background: rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 1.5s ease;
+            width: 0;
+        }
+    </style>
+</head>
+<body class="bg-[#0f0f23] text-white">
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-dumbbell">
+            <div class="loader-bar"></div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar fixed top-0 w-full z-50 bg-transparent py-4 px-6 lg:px-12">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="#home" class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 flex items-center justify-center">
+                    <i class="fas fa-dumbbell text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white">PRO FITNESS</h1>
+                    <p class="text-xs text-orange-400 -mt-1">GYM</p>
+                </div>
+            </a>
+            
+            <div class="hidden lg:flex items-center gap-8">
+                <a href="#home" class="text-white hover:text-orange-400 transition-colors font-medium">Home</a>
+                <a href="#about" class="text-gray-300 hover:text-orange-400 transition-colors font-medium">About</a>
+                <a href="#services" class="text-gray-300 hover:text-orange-400 transition-colors font-medium">Services</a>
+                <a href="#schedule" class="text-gray-300 hover:text-orange-400 transition-colors font-medium">Schedule</a>
+                <a href="#pricing" class="text-gray-300 hover:text-orange-400 transition-colors font-medium">Pricing</a>
+                <a href="#trainers" class="text-gray-300 hover:text-orange-400 transition-colors font-medium">Trainers</a>
+                <a href="#bmi" class="text-gray-300 hover:text-orange-400 transition-colors font-medium">BMI</a>
+                <a href="#contact" class="text-gray-300 hover:text-orange-400 transition-colors font-medium">Contact</a>
+                <a href="#contact" class="cta-btn px-6 py-2 rounded-full text-white font-semibold ripple">Join Now</a>
+            </div>
+
+            <button class="lg:hidden text-white text-2xl" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu fixed top-0 right-0 w-72 h-full bg-[#0f0f23] z-[60] p-8 shadow-2xl" id="mobileMenu">
+        <button class="absolute top-6 right-6 text-white text-2xl" id="closeMenu">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="mt-16 flex flex-col gap-6">
+            <a href="#home" class="text-white text-lg hover:text-orange-400 transition-colors mobile-link">Home</a>
+            <a href="#about" class="text-gray-300 text-lg hover:text-orange-400 transition-colors mobile-link">About</a>
+            <a href="#services" class="text-gray-300 text-lg hover:text-orange-400 transition-colors mobile-link">Services</a>
+            <a href="#schedule" class="text-gray-300 text-lg hover:text-orange-400 transition-colors mobile-link">Schedule</a>
+            <a href="#pricing" class="text-gray-300 text-lg hover:text-orange-400 transition-colors mobile-link">Pricing</a>
+            <a href="#trainers" class="text-gray-300 text-lg hover:text-orange-400 transition-colors mobile-link">Trainers</a>
+            <a href="#bmi" class="text-gray-300 text-lg hover:text-orange-400 transition-colors mobile-link">BMI Calculator</a>
+            <a href="#contact" class="text-gray-300 text-lg hover:text-orange-400 transition-colors mobile-link">Contact</a>
+            <a href="#contact" class="cta-btn px-6 py-3 rounded-full text-white font-semibold text-center mt-4">Join Now</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero flex items-center justify-center relative">
+        <!-- Particles -->
+        <div class="particle w-3 h-3" style="top:20%;left:10%;animation-delay:0s;"></div>
+        <div class="particle w-2 h-2" style="top:60%;left:80%;animation-delay:1s;"></div>
+        <div class="particle w-4 h-4" style="top:40%;left:60%;animation-delay:2s;"></div>
+        <div class="particle w-2 h-2" style="top:80%;left:30%;animation-delay:3s;"></div>
+        <div class="particle w-3 h-3" style="top:30%;left:90%;animation-delay:4s;"></div>
+        <div class="particle w-2 h-2" style="top:70%;left:15%;animation-delay:1.5s;"></div>
+        <div class="particle w-3 h-3" style="top:10%;left:50%;animation-delay:2.5s;"></div>
+
+        <div class="text-center px-6 relative z-10 w-full max-w-5xl">
+            <div data-aos="fade-down" data-aos-duration="1000">
+                <p class="text-orange-400 text-lg md:text-xl mb-4 tracking-widest uppercase font-medium">Welcome to</p>
+            </div>
+            <div data-aos="zoom-in" data-aos-duration="1200" data-aos-delay="200">
+                <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mb-4 glow-text leading-tight">
+                    PRO FITNESS <span class="text-orange-400">GYM</span>
+                </h1>
+            </div>
+            <div data-aos="fade-up" data-aos-duration="1000" data-aos-delay="400">
+                <p class="text-lg sm:text-xl md:text-2xl text-gray-300 mb-2" id="typingContainer">
+                    <span id="typingText" class="typing-text"></span>
+                </p>
+                <p class="text-base sm:text-lg text-gray-400 mb-8">
+                    <i class="fas fa-map-marker-alt text-orange-400 mr-2"></i>Javed Bahria
+                </p>
+            </div>
+            <div data-aos="fade-up" data-aos-duration="1000" data-aos-delay="600" class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#pricing" class="cta-btn px-8 py-4 rounded-full text-white font-bold text-lg ripple">
+                    <i class="fas fa-bolt mr-2"></i>Start Your Journey
+                </a>
+                <a href="#about" class="px-8 py-4 rounded-full border-2 border-orange-400 text-orange-400 font-bold text-lg hover:bg-orange-400 hover:text-white transition-all">
+                    <i class="fas fa-play mr-2"></i>Learn More
+                </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="mt-12 sm:mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="800">
+                <div class="stat-item text-center p-2 sm:p-4">
+                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-black text-orange-400 counter" data-target="500">0</h3>
+                    <p class="text-xs sm:text-sm text-gray-400 mt-1">Happy Members</p>
+                </div>
+                <div class="stat-item text-center p-2 sm:p-4">
+                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-black text-orange-400 counter" data-target="15">0</h3>
+                    <p class="text-xs sm:text-sm text-gray-400 mt-1">Expert Trainers</p>
+                </div>
+                <div class="stat-item text-center p-2 sm:p-4">
+                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-black text-orange-400 counter" data-target="50">0</h3>
+                    <p class="text-xs sm:text-sm text-gray-400 mt-1">Programs</p>
+                </div>
+                <div class="stat-item text-center p-2 sm:p-4">
+                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-black text-orange-400 counter" data-target="8">0</h3>
+                    <p class="text-xs sm:text-sm text-gray-400 mt-1">Years Experience</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <i class="fas fa-chevron-down text-orange-400 text-2xl"></i>
+        </div>
+    </section>
+
+    <!-- Marquee -->
+    <div class="bg-gradient-to-r from-orange-500 to-yellow-500 py-3 marquee">
+        <div class="marquee-content">
+            <span class="text-white font-bold text-lg mx-8">💪 BUILD MUSCLE</span>
+            <span class="text-white font-bold text-lg mx-8">🔥 BURN FAT</span>
+            <span class="text-white font-bold text-lg mx-8">⚡ GET STRONG</span>
+            <span class="text-white font-bold text-lg mx-8">🏋️ LIFT HEAVY</span>
+            <span class="text-white font-bold text-lg mx-8">💪 BUILD MUSCLE</span>
+            <span class="text-white font-bold text-lg mx-8">🔥 BURN FAT</span>
+            <span class="text-white font-bold text-lg mx-8">⚡ GET STRONG</span>
+            <span class="text-white font-bold text-lg mx-8">🏋️ LIFT HEAVY</span>
+            <span class="text-white font-bold text-lg mx-8">💪 BUILD MUSCLE</span>
+            <span class="text-white font-bold text-lg mx-8">🔥 BURN FAT</span>
+            <span class="text-white font-bold text-lg mx-8">⚡ GET STRONG</span>
+            <span class="text-white font-bold text-lg mx-8">🏋️ LIFT HEAVY</span>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-6 lg:px-12 bg-[#0f0f23]">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div data-aos="fade-right">
+                    <div class="relative">
+                        <div class="w-full h-96 rounded-2xl bg-gradient-to-br from-orange-500/20 to-yellow-500/20 border border-orange-500/30 flex items-center justify-center overflow-hidden">
+                            <div class="text-center">
+                                <i class="fas fa-dumbbell text-8xl text-orange-400 mb-4 pulse-icon"></i>
+                                <div class="flex gap-4 justify-center mt-6">
+                                    <div class="w-20 h-20 rounded-full bg-orange-500/20 flex items-center justify-center">
+                                        <i class="fas fa-heartbeat text-2xl text-orange-400"></i>
+                                    </div>
+                                    <div class="w-20 h-20 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                                        <i class="fas fa-fire text-2xl text-yellow-400"></i>
+                                    </div>
+                                    <div class="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center">
+                                        <i class="fas fa-bolt text-2xl text-red-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-orange-500/10 rounded-full blur-xl"></div>
+                        <div class="absolute -top-4 -left-4 w-24 h-24 bg-yellow-500/10 rounded-full blur-xl"></div>
+                    </div>
+                </div>
+                <div data-aos="fade-left">
+                    <p class="text-orange-400 font-semibold mb-2 tracking-widest uppercase">About Us</p>
+                    <h2 class="text-4xl md:text-5xl font-black mb-6">Transform Your Body, <span class="text-orange-400">Transform Your Life</span></h2>
+                    <p class="text-gray-300 text-lg mb-6 leading-relaxed">
+                        Pro Fitness Gym in Javed Bahria is your ultimate destination for fitness excellence. 
+                        With state-of-the-art equipment, certified trainers, and a motivating atmosphere, 
+                        we help you achieve your fitness goals whether you're a beginner or a pro athlete.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-orange-400"></i>
+                            <span class="text-gray-300">Modern Equipment</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-orange-400"></i>
+                            <span class="text-gray-300">Expert Trainers</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-orange-400"></i>
+                            <span class="text-gray-300">AC Training Hall</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-orange-400"></i>
+                            <span class="text-gray-300">Locker Room</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-orange-400"></i>
+                            <span class="text-gray-300">Diet Plans</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-orange-400"></i>
+                            <span class="text-gray-300">Cardio Zone</span>
+                        </div>
+                    </div>
+                    <a href="#contact" class="cta-btn inline-block px-8 py-3 rounded-full text-white font-bold ripple">
+                        <i class="fas fa-arrow-right mr-2"></i>Get Started Today
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 px-6 lg:px-12 bg-[#1a1a2e]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <p class="text-orange-400 font-semibold mb-2 tracking-widest uppercase">Our Services</p>
+                <h2 class="text-4xl md:text-5xl font-black section-title">What We <span class="text-orange-400">Offer</span></h2>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="service-card rounded-2xl p-8" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-16 h-16 rounded-full bg-orange-500/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-dumbbell text-2xl text-orange-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Weight Training</h3>
+                    <p class="text-gray-400">Build muscle mass and strength with our comprehensive weight training programs and premium equipment.</p>
+                </div>
+                <div class="service-card rounded-2xl p-8" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-heartbeat text-2xl text-red-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Cardio Training</h3>
+                    <p class="text-gray-400">Improve cardiovascular health with our state-of-the-art treadmills, bikes, and elliptical machines.</p>
+                </div>
+                <div class="service-card rounded-2xl p-8" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-16 h-16 rounded-full bg-yellow-500/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-users text-2xl text-yellow-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Group Classes</h3>
+                    <p class="text-gray-400">Join energetic group sessions including Zumba, HIIT, Yoga, and CrossFit for maximum motivation.</p>
+                </div>
+                <div class="service-card rounded-2xl p-8" data-aos="fade-up" data-aos-delay="400">
+                    <div class="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-user-tie text-2xl text-green-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Personal Training</h3>
+                    <p class="text-gray-400">Get one-on-one guidance from certified trainers who create customized workout plans for you.</p>
+                </div>
+                <div class="service-card rounded-2xl p-8" data-aos="fade-up" data-aos-delay="500">
+                    <div class="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-apple-alt text-2xl text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Nutrition Plans</h3>
+                    <p class="text-gray-400">Achieve your goals faster with personalized diet plans designed by our nutrition experts.</p>
+                </div>
+                <div class="service-card rounded-2xl p-8" data-aos="fade-up" data-aos-delay="600">
+                    <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-spa text-2xl text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Yoga & Meditation</h3>
+                    <p class="text-gray-400">Find balance and flexibility through our yoga and meditation sessions for mind and body wellness.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section id="schedule" class="py-20 px-6 lg:px-12 bg-[#0f0f23]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <p class="text-orange-400 font-semibold mb-2 tracking-widest uppercase">Timetable</p>
+                <h2 class="text-4xl md:text-5xl font-black section-title">Class <span class="text-orange-400">Schedule</span></h2>
+            </div>
+            
+            <!-- Timing Info -->
+            <div class="grid md:grid-cols-2 gap-8 mb-12" data-aos="fade-up">
+                <div class="bg-gradient-to-r from-orange-500/10 to-transparent border border-orange-500/30 rounded-2xl p-8 text-center">
+                    <i class="fas fa-sun text-4xl text-yellow-400 mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-2">Morning Shift</h3>
+                    <p class="text-3xl font-black text-orange-400">7:00 AM - 10:00 AM</p>
+                    <p class="text-gray-400 mt-2">Monday to Saturday</p>
+                </div>
+                <div class="bg-gradient-to-r from-blue-500/10 to-transparent border border-blue-500/30 rounded-2xl p-8 text-center">
+                    <i class="fas fa-moon text-4xl text-blue-400 mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-2">Evening Shift</h3>
+                    <p class="text-3xl font-black text-blue-400">6:00 PM - 11:00 PM</p>
+                    <p class="text-gray-400 mt-2">Monday to Saturday</p>
+                </div>
+            </div>
+
+            <!-- Weekly Schedule -->
+            <div class="overflow-x-auto" data-aos="fade-up" data-aos-delay="200">
+                <table class="schedule-table w-full min-w-[700px]">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-orange-500/20 to-transparent">
+                            <th class="text-orange-400 font-bold text-lg rounded-l-xl">Time</th>
+                            <th class="text-orange-400 font-bold text-lg">Mon</th>
+                            <th class="text-orange-400 font-bold text-lg">Tue</th>
+                            <th class="text-orange-400 font-bold text-lg">Wed</th>
+                            <th class="text-orange-400 font-bold text-lg">Thu</th>
+                            <th class="text-orange-400 font-bold text-lg">Fri</th>
+                            <th class="text-orange-400 font-bold text-lg rounded-r-xl">Sat</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300">
+                        <tr class="border-b border-gray-800">
+                            <td class="font-bold text-orange-400">7:00 AM</td>
+                            <td>Weight Training</td>
+                            <td>Cardio</td>
+                            <td>Weight Training</td>
+                            <td>Cardio</td>
+                            <td>Weight Training</td>
+                            <td>Full Body</td>
+                        </tr>
+                        <tr class="border-b border-gray-800">
+                            <td class="font-bold text-orange-400">8:00 AM</td>
+                            <td>Yoga</td>
+                            <td>CrossFit</td>
+                            <td>Yoga</td>
+                            <td>CrossFit</td>
+                            <td>Yoga</td>
+                            <td>HIIT</td>
+                        </tr>
+                        <tr class="border-b border-gray-800">
+                            <td class="font-bold text-orange-400">9:00 AM</td>
+                            <td>Cardio</td>
+                            <td>Weight Training</td>
+                            <td>Cardio</td>
+                            <td>Weight Training</td>
+                            <td>Cardio</td>
+                            <td>Zumba</td>
+                        </tr>
+                        <tr class="border-b border-gray-800">
+                            <td class="font-bold text-orange-400">6:00 PM</td>
+                            <td>Weight Training</td>
+                            <td>HIIT</td>
+                            <td>Weight Training</td>
+                            <td>HIIT</td>
+                            <td>Weight Training</td>
+                            <td>Full Body</td>
+                        </tr>
+                        <tr class="border-b border-gray-800">
+                            <td class="font-bold text-orange-400">7:00 PM</td>
+                            <td>CrossFit</td>
+                            <td>Weight Training</td>
+                            <td>CrossFit</td>
+                            <td>Weight Training</td>
+                            <td>CrossFit</td>
+                            <td>Cardio</td>
+                        </tr>
+                        <tr class="border-b border-gray-800">
+                            <td class="font-bold text-orange-400">8:00 PM</td>
+                            <td>Cardio</td>
+                            <td>Yoga</td>
+                            <td>Cardio</td>
+                            <td>Yoga</td>
+                            <td>Cardio</td>
+                            <td>Open Gym</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-orange-400">9:00 PM</td>
+                            <td>Open Gym</td>
+                            <td>Open Gym</td>
+                            <td>Open Gym</td>
+                            <td>Open Gym</td>
+                            <td>Open Gym</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-8" data-aos="fade-up">
+                <p class="text-gray-400"><i class="fas fa-info-circle text-orange-400 mr-2"></i>Sunday: Closed | Timings may vary on public holidays</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 px-6 lg:px-12 bg-[#1a1a2e]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <p class="text-orange-400 font-semibold mb-2 tracking-widest uppercase">Membership Plans</p>
+                <h2 class="text-4xl md:text-5xl font-black section-title">Choose Your <span class="text-orange-400">Plan</span></h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 items-center">
+                <!-- Basic Plan -->
+                <div class="pricing-card rounded-2xl p-8 text-center" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-16 h-16 rounded-full bg-gray-500/20 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-star text-2xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Basic</h3>
+                    <div class="my-6">
+                        <span class="text-5xl font-black text-white">Rs 3,000</span>
+                        <span class="text-gray-400">/month</span>
+                    </div>
+                    <ul class="text-left space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>Gym Access</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>Locker Facility</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>Basic Equipment</li>
+                        <li class="flex items-center gap-3 text-gray-500"><i class="fas fa-times text-red-400"></i>Personal Trainer</li>
+                        <li class="flex items-center gap-3 text-gray-500"><i class="fas fa-times text-red-400"></i>Diet Plan</li>
+                        <li class="flex items-center gap-3 text-gray-500"><i class="fas fa-times text-red-400"></i>Group Classes</li>
+                    </ul>
+                    <a href="#contact" class="block w-full py-3 rounded-full border-2 border-orange-400 text-orange-400 font-bold hover:bg-orange-400 hover:text-white transition-all">Get Started</a>
+                </div>
+
+                <!-- Pro Plan (Featured) -->
+                <div class="pricing-card featured rounded-2xl p-8 text-center relative" data-aos="fade-up" data-aos-delay="200">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-orange-500 to-yellow-500 px-6 py-1 rounded-full text-sm font-bold">
+                        MOST POPULAR
+                    </div>
+                    <div class="w-16 h-16 rounded-full bg-orange-500/20 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-crown text-2xl text-orange-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Pro</h3>
+                    <div class="my-6">
+                        <span class="text-5xl font-black text-orange-400">Rs 5,000</span>
+                        <span class="text-gray-400">/month</span>
+                    </div>
+                    <ul class="text-left space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>Full Gym Access</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>Locker Facility</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>All Equipment</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>Personal Trainer</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>Diet Plan</li>
+                        <li class="flex items-center gap-3 text-gray-500"><i class="fas fa-times text-red-400"></i>Group Classes</li>
+                    </ul>
+                    <a href="#contact" class="block w-full py-3 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-bold hover:shadow-lg hover:shadow-orange-500/30 transition-all ripple">Get Started</a>
+                </div>
+
+                <!-- Elite Plan -->
+                <div class="pricing-card rounded-2xl p-8 text-center" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-16 h-16 rounded-full bg-yellow-500/20 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-gem text-2xl text-yellow-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Elite</h3>
+                    <div class="my-6">
+                        <span class="text-5xl font-black text-white">Rs 8,000</span>
+                        <span class="text-gray-400">/month</span>
+                    </div>
+                    <ul class="text-left space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>24/7 Gym Access</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>Premium Locker</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>All Equipment</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>Dedicated Trainer</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>Custom Diet Plan</li>
+                        <li class="flex items-center gap-3 text-gray-300"><i class="fas fa-check text-green-400"></i>All Group Classes</li>
+                    </ul>
+                    <a href="#contact" class="block w-full py-3 rounded-full border-2 border-orange-400 text-orange-400 font-bold hover:bg-orange-400 hover:text-white transition-all">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trainers Section -->
+    <section id="trainers" class="py-20 px-6 lg:px-12 bg-[#0f0f23]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <p class="text-orange-400 font-semibold mb-2 tracking-widest uppercase">Our Team</p>
+                <h2 class="text-4xl md:text-5xl font-black section-title">Expert <span class="text-orange-400">Trainers</span></h2>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="trainer-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="h-72 bg-gradient-to-br from-orange-500/30 to-red-500/30 flex items-center justify-center">
+                        <i class="fas fa-user text-6xl text-orange-400/50"></i>
+                    </div>
+                    <div class="trainer-overlay">
+                        <h3 class="text-xl font-bold">Ahmed Khan</h3>
+                        <p class="text-orange-400">Head Trainer</p>
+                        <p class="text-gray-400 text-sm mt-2">10+ years experience in bodybuilding & strength training</p>
+                        <div class="flex gap-3 mt-3">
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="trainer-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="h-72 bg-gradient-to-br from-blue-500/30 to-purple-500/30 flex items-center justify-center">
+                        <i class="fas fa-user text-6xl text-blue-400/50"></i>
+                    </div>
+                    <div class="trainer-overlay">
+                        <h3 class="text-xl font-bold">Ali Raza</h3>
+                        <p class="text-blue-400">Cardio Specialist</p>
+                        <p class="text-gray-400 text-sm mt-2">Expert in cardio, HIIT & weight loss programs</p>
+                        <div class="flex gap-3 mt-3">
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="trainer-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="h-72 bg-gradient-to-br from-green-500/30 to-teal-500/30 flex items-center justify-center">
+                        <i class="fas fa-user text-6xl text-green-400/50"></i>
+                    </div>
+                    <div class="trainer-overlay">
+                        <h3 class="text-xl font-bold">Usman Malik</h3>
+                        <p class="text-green-400">CrossFit Coach</p>
+                        <p class="text-gray-400 text-sm mt-2">Certified CrossFit L2 trainer & nutritionist</p>
+                        <div class="flex gap-3 mt-3">
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="trainer-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="h-72 bg-gradient-to-br from-yellow-500/30 to-orange-500/30 flex items-center justify-center">
+                        <i class="fas fa-user text-6xl text-yellow-400/50"></i>
+                    </div>
+                    <div class="trainer-overlay">
+                        <h3 class="text-xl font-bold">Bilal Shah</h3>
+                        <p class="text-yellow-400">Yoga Instructor</p>
+                        <p class="text-gray-400 text-sm mt-2">Certified yoga & meditation instructor, 8+ years</p>
+                        <div class="flex gap-3 mt-3">
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-gray-400 hover:text-orange-400"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BMI Calculator -->
+    <section id="bmi" class="py-20 px-6 lg:px-12 bg-[#1a1a2e]">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <p class="text-orange-400 font-semibold mb-2 tracking-widest uppercase">Health Check</p>
+                <h2 class="text-4xl md:text-5xl font-black section-title">BMI <span class="text-orange-400">Calculator</span></h2>
+            </div>
+            <div class="bg-gradient-to-br from-[#0f0f23] to-[#16213e] rounded-2xl p-8 md:p-12 border border-orange-500/20" data-aos="fade-up" data-aos-delay="200">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <div class="mb-6">
+                            <label class="text-gray-300 block mb-2 font-medium">Height (cm)</label>
+                            <input type="number" id="bmiHeight" placeholder="e.g. 175" class="form-input w-full px-4 py-3 rounded-xl text-white">
+                        </div>
+                        <div class="mb-6">
+                            <label class="text-gray-300 block mb-2 font-medium">Weight (kg)</label>
+                            <input type="number" id="bmiWeight" placeholder="e.g. 70" class="form-input w-full px-4 py-3 rounded-xl text-white">
+                        </div>
+                        <button onclick="calculateBMI()" class="cta-btn w-full py-3 rounded-xl text-white font-bold text-lg ripple">
+                            <i class="fas fa-calculator mr-2"></i>Calculate BMI
+                        </button>
+                    </div>
+                    <div class="flex flex-col justify-center items-center">
+                        <div id="bmiResult" class="bmi-result text-center">
+                            <div class="w-40 h-40 rounded-full border-4 border-gray-700 flex items-center justify-center mb-4 mx-auto" id="bmiCircle">
+                                <div>
+                                    <p class="text-4xl font-black text-gray-500" id="bmiValue">--</p>
+                                    <p class="text-sm text-gray-500" id="bmiCategory">Enter details</p>
+                                </div>
+                            </div>
+                            <div class="w-full mt-4">
+                                <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                    <span>Underweight</span>
+                                    <span>Normal</span>
+                                    <span>Overweight</span>
+                                    <span>Obese</span>
+                                </div>
+                                <div class="h-3 rounded-full bg-gradient-to-r from-blue-400 via-green-400 via-yellow-400 to-red-500"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-20 px-6 lg:px-12 bg-[#0f0f23]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <p class="text-orange-400 font-semibold mb-2 tracking-widest uppercase">Testimonials</p>
+                <h2 class="text-4xl md:text-5xl font-black section-title">What Members <span class="text-orange-400">Say</span></h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-300 mb-6 italic">"Best gym in Bahria! The trainers are amazing and the equipment is top-notch. Lost 15kg in 4 months!"</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
+                            <i class="fas fa-user text-orange-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Hassan Ali</h4>
+                            <p class="text-gray-400 text-sm">Member since 2023</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-300 mb-6 italic">"The personal training sessions changed my life. The diet plan and workout routine are perfectly customized."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-user text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Fahad Malik</h4>
+                            <p class="text-gray-400 text-sm">Member since 2022</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star-half-alt text-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-300 mb-6 italic">"Great atmosphere and friendly staff. The group classes are so much fun. Highly recommend Pro Fitness Gym!"</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                            <i class="fas fa-user text-green-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">Zain Abbas</h4>
+                            <p class="text-gray-400 text-sm">Member since 2024</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 px-6 lg:px-12 bg-[#1a1a2e]">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <p class="text-orange-400 font-semibold mb-2 tracking-widest uppercase">Get In Touch</p>
+                <h2 class="text-4xl md:text-5xl font-black section-title">Contact <span class="text-orange-400">Us</span></h2>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Contact Info -->
+                <div data-aos="fade-right">
+                    <h3 class="text-2xl font-bold mb-8">Let's Start Your Fitness Journey!</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4 p-4 rounded-xl bg-[#0f0f23]/50 border border-gray-800 hover:border-orange-500/30 transition-all">
+                            <div class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-map-marker-alt text-orange-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Location</h4>
+                                <p class="text-gray-400">Javed Bahria</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-4 rounded-xl bg-[#0f0f23]/50 border border-gray-800 hover:border-orange-500/30 transition-all">
+                            <div class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-envelope text-orange-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Email</h4>
+                                <a href="mailto:alamzeb@gmail.com" class="text-gray-400 hover:text-orange-400 transition-colors">alamzeb@gmail.com</a>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-4 rounded-xl bg-[#0f0f23]/50 border border-gray-800 hover:border-orange-500/30 transition-all">
+                            <div class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-clock text-orange-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Working Hours</h4>
+                                <p class="text-gray-400">Mon - Sat: Morning 7AM - 10AM</p>
+                                <p class="text-gray-400">Mon - Sat: Evening 6PM - 11PM</p>
+                                <p class="text-red-400">Sunday: Closed</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 p-4 rounded-xl bg-[#0f0f23]/50 border border-gray-800 hover:border-orange-500/30 transition-all">
+                            <div class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-share-alt text-orange-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Follow Us</h4>
+                                <div class="flex gap-4 mt-2">
+                                    <a href="#" class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center hover:bg-orange-500 transition-all">
+                                        <i class="fab fa-facebook text-white"></i>
+                                    </a>
+                                    <a href="#" class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center hover:bg-orange-500 transition-all">
+                                        <i class="fab fa-instagram text-white"></i>
+                                    </a>
+                                    <a href="#" class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center hover:bg-orange-500 transition-all">
+                                        <i class="fab fa-whatsapp text-white"></i>
+                                    </a>
+                                    <a href="#" class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center hover:bg-orange-500 transition-all">
+                                        <i class="fab fa-youtube text-white"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div data-aos="fade-left">
+                    <form id="contactForm" class="bg-[#0f0f23]/50 rounded-2xl p-8 border border-gray-800">
+                        <h3 class="text-xl font-bold mb-6">Send us a Message</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <input type="text" placeholder="Your Name" required class="form-input w-full px-4 py-3 rounded-xl text-white">
+                            </div>
+                            <div>
+                                <input type="email" placeholder="Your Email" required class="form-input w-full px-4 py-3 rounded-xl text-white">
+                            </div>
+                            <div>
+                                <input type="tel" placeholder="Your Phone" class="form-input w-full px-4 py-3 rounded-xl text-white">
+                            </div>
+                            <div>
+                                <select class="form-input w-full px-4 py-3 rounded-xl text-white">
+                                    <option value="" class="bg-[#0f0f23]">Select Interest</option>
+                                    <option value="membership" class="bg-[#0f0f23]">Membership Inquiry</option>
+                                    <option value="personal" class="bg-[#0f0f23]">Personal Training</option>
+                                    <option value="group" class="bg-[#0f0f23]">Group Classes</option>
+                                    <option value="diet" class="bg-[#0f0f23]">Diet Consultation</option>
+                                    <option value="other" class="bg-[#0f0f23]">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <textarea placeholder="Your Message" rows="4" class="form-input w-full px-4 py-3 rounded-xl text-white resize-none"></textarea>
+                            </div>
+                            <button type="submit" class="cta-btn w-full py-4 rounded-xl text-white font-bold text-lg ripple">
+                                <i class="fas fa-paper-plane mr-2"></i>Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#0a0a1a] py-16 px-6 lg:px-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-yellow-500 flex items-center justify-center">
+                            <i class="fas fa-dumbbell text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold">PRO FITNESS</h3>
+                            <p class="text-xs text-orange-400 -mt-1">GYM</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400">Your ultimate fitness destination in Javed Bahria. Transform your body, transform your life.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-orange-400 transition-colors">Home</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-orange-400 transition-colors">About Us</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-orange-400 transition-colors">Services</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-orange-400 transition-colors">Pricing</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-orange-400 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Our Services</h4>
+                    <ul class="space-y-2">
+                        <li class="text-gray-400">Weight Training</li>
+                        <li class="text-gray-400">Cardio Training</li>
+                        <li class="text-gray-400">Personal Training</li>
+                        <li class="text-gray-400">Group Classes</li>
+                        <li class="text-gray-400">Nutrition Plans</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Contact Info</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-2 text-gray-400">
+                            <i class="fas fa-map-marker-alt text-orange-400"></i>
+                            Javed Bahria
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-400">
+                            <i class="fas fa-envelope text-orange-400"></i>
+                            <a href="mailto:alamzeb@gmail.com" class="hover:text-orange-400 transition-colors">alamzeb@gmail.com</a>
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-400">
+                            <i class="fas fa-clock text-orange-400"></i>
+                            Mon-Sat: 7AM-10AM, 6PM-11PM
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-gray-400">&copy; 2026 Pro Fitness Gym. All Rights Reserved.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-orange-500 transition-all">
+                        <i class="fab fa-facebook text-white"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-orange-500 transition-all">
+                        <i class="fab fa-instagram text-white"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-orange-500 transition-all">
+                        <i class="fab fa-whatsapp text-white"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-orange-500 transition-all">
+                        <i class="fab fa-youtube text-white"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- WhatsApp Float Button -->
+    <a href="https://wa.me/923001234567" target="_blank" class="fixed bottom-30 right-8 w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg hover:scale-110 transition-transform z-50">
+        <i class="fab fa-whatsapp text-white text-2xl"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true
+        });
+
+        // Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            const backToTop = document.getElementById('backToTop');
+            
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            if (window.scrollY > 500) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        // Mobile Menu
+        document.getElementById('menuBtn').addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.add('active');
+        });
+        document.getElementById('closeMenu').addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.remove('active');
+        });
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobileMenu').classList.remove('active');
+            });
+        });
+
+        // Counter Animation
+        const counters = document.querySelectorAll('.counter');
+        const observerOptions = { threshold: 0.5 };
+        
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target;
+                    const target = parseInt(counter.getAttribute('data-target'));
+                    const duration = 2000;
+                    const step = target / (duration / 16);
+                    let current = 0;
+                    
+                    const updateCounter = () => {
+                        current += step;
+                        if (current < target) {
+                            counter.textContent = Math.floor(current) + '+';
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            counter.textContent = target + '+';
+                        }
+                    };
+                    updateCounter();
+                    counterObserver.unobserve(counter);
+                }
+            });
+        }, observerOptions);
+
+        counters.forEach(counter => counterObserver.observe(counter));
+
+        // Typing Animation
+        const typingTexts = ['Build Your Dream Body', 'Get Stronger Every Day', 'Transform Your Lifestyle'];
+        let textIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typingElement = document.getElementById('typingText');
+
+        function typeText() {
+            const currentText = typingTexts[textIndex];
+            
+            if (isDeleting) {
+                typingElement.textContent = currentText.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typingElement.textContent = currentText.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 50 : 100;
+
+            if (!isDeleting && charIndex === currentText.length) {
+                typeSpeed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                textIndex = (textIndex + 1) % typingTexts.length;
+                typeSpeed = 500;
+            }
+
+            setTimeout(typeText, typeSpeed);
+        }
+        typeText();
+
+        // BMI Calculator
+        function calculateBMI() {
+            const height = parseFloat(document.getElementById('bmiHeight').value);
+            const weight = parseFloat(document.getElementById('bmiWeight').value);
+            
+            if (!height || !weight || height <= 0 || weight <= 0) {
+                alert('Please enter valid height and weight values.');
+                return;
+            }
+
+            const heightM = height / 100;
+            const bmi = (weight / (heightM * heightM)).toFixed(1);
+            
+            let category = '';
+            let color = '';
+            
+            if (bmi < 18.5) {
+                category = 'Underweight';
+                color = '#60a5fa';
+            } else if (bmi < 25) {
+                category = 'Normal';
+                color = '#4ade80';
+            } else if (bmi < 30) {
+                category = 'Overweight';
+                color = '#facc15';
+            } else {
+                category = 'Obese';
+                color = '#f87171';
+            }
+
+            document.getElementById('bmiValue').textContent = bmi;
+            document.getElementById('bmiValue').style.color = color;
+            document.getElementById('bmiCategory').textContent = category;
+            document.getElementById('bmiCategory').style.color = color;
+            document.getElementById('bmiCircle').style.borderColor = color;
+        }
+
+        // Contact Form
+        document.getElementById('contactForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Thank you for your message! We will get back to you soon. 🏋️');
+            e.target.reset();
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Progress bars animation on scroll
+        const progressBars = document.querySelectorAll('.progress-fill');
+        const progressObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const width = entry.target.getAttribute('data-width');
+                    entry.target.style.width = width + '%';
+                }
+            });
+        }, { threshold: 0.5 });
+
+        progressBars.forEach(bar => progressObserver.observe(bar));
+    </script>
+</body>
+</html>
